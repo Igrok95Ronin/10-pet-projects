@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  todo-app: # задаем имя любое
+    build: ./ #Ишет докер файл на основания которого соберет докер файл
+    command: ./todo-app # Команды которые будут выполняться внутри контейнера в нашем случи запуск контейнера
+    ports: #порты запуска
+     - 4000:4000
+    depends_on: #указываем зависимые контейнеры, наше приложение не запуститься пока не запустяться перечисленные контейнеры
+     - db
+    environment: #передаем перменные окружения
+     - DB_PASSWORD=secret
+
+#  db:
+#    restart: always #Бд будет запускать при запуске контейнера или компьютера
+#    image: mysql # имя образа на основании которого будет запускать данный контейнер
+#    volumes: #файл конфигурации бд
+#      - ./internal/db:/etc/mysql/conf.d
+#    environment:
+#      - MYSQL_ROOT_PASSWORD=secret
+#    ports:
+#      - 3306:3306
+#
+
+
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+    volumes: #файл конфигурации бд
+      - ./internal/db:/etc/mysql/conf.d
+    ports:
+      - 3306:3306
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
