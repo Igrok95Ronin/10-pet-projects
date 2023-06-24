@@ -31,6 +31,7 @@ services:
       MYSQL_ROOT_PASSWORD: example
     volumes: #файл конфигурации бд
       - ./internal/db:/etc/mysql/conf.d
+      - ./internal/db/mydb.sql:/docker-entrypoint-initdb.d/mydb.sql:ro
     ports:
       - 3306:3306
 
