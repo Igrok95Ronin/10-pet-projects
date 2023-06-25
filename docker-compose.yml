@@ -28,7 +28,7 @@ services:
       MYSQL_PASSWORD: '${DB_PASSWORD}'
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     volumes:
-      - 'my_super_docker-mysql:/var/lib/mysql'
+      - './internal/db/mysql_data:/var/lib/mysql'
     networks:
       - my_super_docker-net
 
@@ -44,7 +44,3 @@ services:
 networks:
   my_super_docker-net:
     driver: bridge
-
-volumes:
-  my_super_docker-mysql:
-    driver: local
