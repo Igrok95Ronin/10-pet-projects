@@ -2,41 +2,49 @@ version: '3.8'
 
 services:
   todo-app: # задаем имя любое
+    container_name: my_super_docker-todo-app
+    restart: unless-stopped
     build: ./ #Ишет докер файл на основания которого соберет докер файл
     command: ./todo-app # Команды которые будут выполняться внутри контейнера в нашем случи запуск контейнера
     ports: #порты запуска
-     - 4000:4000
+      - '${APP_PORT:-4000}:4000'
     depends_on: #указываем зависимые контейнеры, наше приложение не запуститься пока не запустяться перечисленные контейнеры
-     - db
+      - db
     environment: #передаем перменные окружения
-     - DB_PASSWORD=secret
-
-#  db:
-#    restart: always #Бд будет запускать при запуске контейнера или компьютера
-#    image: mysql # имя образа на основании которого будет запускать данный контейнер
-#    volumes: #файл конфигурации бд
-#      - ./internal/db:/etc/mysql/conf.d
-#    environment:
-#      - MYSQL_ROOT_PASSWORD=secret
-#    ports:
-#      - 3306:3306
-#
-
+      DB_PASSWORD: '${DB_PASSWORD}'
+    networks:
+      - my_super_docker-net
 
   db:
-    image: mysql
-    command: --default-authentication-plugin=mysql_native_password
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: example
-    volumes: #файл конфигурации бд
-      - ./internal/db:/etc/mysql/conf.d
-      - ./internal/db/mydb.sql:/docker-entrypoint-initdb.d/mydb.sql:ro
+    image: 'mysql:8.0'
+    container_name: my_super_docker-db
+    restart: unless-stopped
     ports:
-      - 3306:3306
+      - '${FORWARD_DB_PORT:-3306}:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_DATABASE: '${DB_DATABASE}'
+      MYSQL_USER: '${DB_USERNAME}'
+      MYSQL_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    volumes:
+      - 'my_super_docker-mysql:/var/lib/mysql'
+    networks:
+      - my_super_docker-net
 
   adminer:
+    container_name: my_super_docker-adminer
     image: adminer
-    restart: always
+    restart: unless-stopped
     ports:
-      - 8080:8080
+      - '${FORWARD_ADMINER_PORT:-8080}:8080'
+    networks:
+      - my_super_docker-net
+
+networks:
+  my_super_docker-net:
+    driver: bridge
+
+volumes:
+  my_super_docker-mysql:
+    driver: local

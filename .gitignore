@@ -1,5 +1,4 @@
 .idea/
 .tmp/
 .air.toml
-Dockerfile
-docker-compose.yml
+.env
